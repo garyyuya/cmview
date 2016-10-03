@@ -1,6 +1,15 @@
 package cmview.datasources;
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
+
+import org.biojava.nbio.structure.Chain;
+import org.biojava.nbio.structure.Structure;
+import org.biojava.nbio.structure.StructureIO;
+import org.biojava.nbio.structure.io.mmcif.MMcifParser;
+import org.biojava.nbio.structure.io.mmcif.SimpleMMcifConsumer;
+import org.biojava.nbio.structure.io.mmcif.SimpleMMcifParser;
 
 import owl.core.structure.*;
 import owl.core.structure.graphs.RIGEnsemble;
@@ -85,25 +94,56 @@ public class PdbFtpModel extends Model {
 	public void load(String pdbChainCode, int modelSerial, boolean loadEnsembleGraph) throws ModelConstructionError {
 		// load CIF file from online pdb
 		try {
-			PdbAsymUnit fullpdb = new PdbAsymUnit(cifFile,modelSerial);
+			//PdbAsymUnit fullpdb = new PdbAsymUnit(cifFile,modelSerial);
+			
+			
+
+	        MMcifParser parser = new SimpleMMcifParser();
+
+	        SimpleMMcifConsumer consumer = new SimpleMMcifConsumer();
+
+	        // The Consumer builds up the BioJava - structure object.
+	        // you could also hook in your own and build up you own data model.          
+	        parser.addMMcifConsumer(consumer);
+
+	        BufferedReader br = new BufferedReader(new FileReader(cifFile));
+	       
+	        parser.parse(br);
+	         
+
+	        // now get the protein structure.
+	        Structure fullpdb = consumer.getStructure();
+	        
+	        br.close();
+	        
+	        
+			
 			if(pdbChainCode == null) {
-				this.pdb = fullpdb.getFirstChain();
-				pdbChainCode = this.pdb.getPdbChainCode(); 
-			} else if(!fullpdb.containsPdbChainCode(pdbChainCode)) {
+				//this.pdb = fullpdb.getFirstChain();
+				//pdbChainCode = this.pdb.getPdbChainCode(); 
+				this.pdb = fullpdb.getChains(modelSerial-1).get(0);
+				
+				
+			//} else if(!fullpdb.containsPdbChainCode(pdbChainCode)) {
+			} else if(!fullpdb.hasPdbChain(pdbChainCode)) {
 				throw new ModelConstructionError("Chain '" + pdbChainCode + "' not found");
 			} else {
-				this.pdb = fullpdb.getChain(pdbChainCode);	
+				//this.pdb = fullpdb.getChain(pdbChainCode);	
+				this.pdb = fullpdb.getPolyChainByPDB(pdbChainCode, modelSerial-1);
 			}
-			this.secondaryStructure = pdb.getSecondaryStructure();	// in case, dssp is n/a, use ss from pdb
+			//TODO handle secondary structure later
+			//this.secondaryStructure = pdb.getSecondaryStructure();	// in case, dssp is n/a, use ss from pdb
 			super.checkAndAssignSecondaryStructure();				// if dssp is a/, recalculate ss
 			if(loadEnsembleGraph == false || this.parser.getModels().length == 1) {
-				this.graph = pdb.getRIGraph(edgeType, distCutoff);
+			
+				
+				this.graph = Utils.getRIGraph(pdb, edgeType, distCutoff, modelSerial);
 			} else {
 				RIGEnsemble e = new RIGEnsemble(edgeType, distCutoff);
 				try {
 					e.loadFromMultiModelFile(this.cifFile);
 					this.graph = e.getAverageGraph();
-					this.graph.setPdbCode(this.pdb.getPdbCode());
+					this.graph.setPdbCode(this.pdb.getStructure().getPDBCode());
 					this.graph.setChainCode(pdbChainCode);
 					this.setIsGraphWeighted(true);
 				} catch (IOException e1) {
@@ -114,7 +154,8 @@ public class PdbFtpModel extends Model {
 			// this.graph and this.residues are now available
 			//TODO 4Corinna compute graph geometry and hand it over to ContactView
 			if(Start.USE_CGAP) {
-				this.graphGeom = new RIGGeometry(this.graph, this.pdb);
+				//TODO handle Geom later
+				//this.graphGeom = new RIGGeometry(this.graph, this.pdb);
 				System.out.println("PdbFtpModel   GraphGeometry loaded");
 				//this.graphGeom.printGeom();
 			}

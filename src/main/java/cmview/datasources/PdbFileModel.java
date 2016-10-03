@@ -1,7 +1,10 @@
 package cmview.datasources;
 import java.io.File;
-
+import java.io.FileInputStream;
 import java.io.IOException;
+
+import org.biojava.nbio.structure.Structure;
+import org.biojava.nbio.structure.io.PDBFileParser;
 
 import owl.core.structure.*;
 import owl.core.structure.graphs.RIGEnsemble;
@@ -75,25 +78,35 @@ public class PdbFileModel extends Model {
 	public void load(String pdbChainCode, int modelSerial, boolean loadEnsembleGraph) throws ModelConstructionError, NumberFormatException, IOException {
 		// load PDB file
 		try {
-			PdbAsymUnit fullpdb = new PdbAsymUnit(new File(fileName),modelSerial);
+			//PdbAsymUnit fullpdb = new PdbAsymUnit(new File(fileName),modelSerial);
+			PDBFileParser pdbpars = new PDBFileParser();
+			Structure fullpdb = pdbpars.parsePDBFile(new FileInputStream(fileName));
+			
+			
 			if(pdbChainCode == null) {
-				this.pdb = fullpdb.getFirstChain();
-				pdbChainCode = this.pdb.getPdbChainCode();
-			} else if(!fullpdb.containsPdbChainCode(pdbChainCode)) {
+				//this.pdb = fullpdb.getFirstChain();
+				//pdbChainCode = this.pdb.getPdbChainCode();
+				
+				this.pdb = fullpdb.getChains(modelSerial-1).get(0);
+			//} else if(!fullpdb.containsPdbChainCode(pdbChainCode)) {
+			} else if(!fullpdb.hasPdbChain(pdbChainCode)) {
 				throw new ModelConstructionError("Chain '" + pdbChainCode + "' not found");
 			} else {
-				this.pdb = fullpdb.getChain(pdbChainCode);
+				//this.pdb = fullpdb.getChain(pdbChainCode);
+				this.pdb = fullpdb.getPolyChainByPDB(pdbChainCode, modelSerial-1);
 			}
-			this.secondaryStructure = pdb.getSecondaryStructure(); 	// in case, dssp is n/a, use ss from pdb
+			//TODO handle secondary structure later
+			//this.secondaryStructure = pdb.getSecondaryStructure(); 	// in case, dssp is n/a, use ss from pdb
 			super.checkAndAssignSecondaryStructure();				// if dssp is a/, recalculate ss
 			if(loadEnsembleGraph == false || this.parser.getModels().length == 1) {
-				this.graph = pdb.getRIGraph(edgeType, distCutoff);
+				//this.graph = pdb.getRIGraph(edgeType, distCutoff);
+				this.graph = Utils.getRIGraph(pdb, edgeType, distCutoff, modelSerial);
 			} else {
 				RIGEnsemble e = new RIGEnsemble(edgeType, distCutoff);
 				try {
 					e.loadFromMultiModelFile(new File(this.fileName));
 					this.graph = e.getAverageGraph();
-					this.graph.setPdbCode(this.pdb.getPdbCode());
+					this.graph.setPdbCode(this.pdb.getStructure().getPDBCode());
 					this.graph.setChainCode(pdbChainCode);
 					this.setIsGraphWeighted(true);
 				} catch (IOException e1) {
@@ -106,7 +119,7 @@ public class PdbFileModel extends Model {
 			// this.graph and this.residues are now available
 			//TODO 4Corinna compute graph geometry and hand it over to ContactView
 			if(Start.USE_CGAP) {
-				this.graphGeom = new RIGGeometry(this.graph, this.pdb);
+				//this.graphGeom = new RIGGeometry(this.graph, this.pdb);
 				System.out.println("PdbFileModel   GraphGeometry loaded");
 				//this.graphGeom.printGeom();
 			}
@@ -162,9 +175,9 @@ public class PdbFileModel extends Model {
 			
 		} catch (PdbLoadException e) {
 			throw new ModelConstructionError(e.getMessage());
-		} catch (FileFormatException e) {
+		} /*catch (FileFormatException e) {
 			throw new ModelConstructionError(e.getMessage());
-		}
+		}*/
 	}
 	
 	/**

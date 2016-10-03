@@ -1,11 +1,15 @@
 package cmview.datasources;
 
 import java.io.FileNotFoundException;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.File;
 import java.sql.SQLException;
 import java.util.Collections;
 import java.util.HashMap;
+
+import org.biojava.nbio.structure.Chain;
+import org.biojava.nbio.structure.io.FileConvert;
 
 import owl.core.connections.JPredConnection;
 import owl.core.runners.DsspRunner;
@@ -55,7 +59,8 @@ public abstract class Model {
 	/*--------------------------- member variables --------------------------*/
 
 	// structure and contact map data
-	protected PdbChain pdb; // this can be null if there are no 3D coordinates
+	//protected PdbChain pdb;
+	protected Chain pdb; // this can be null if there are no 3D coordinates
 						// available
 	protected RIGraph graph; // currently every model must have a valid graph
 								// object
@@ -144,7 +149,10 @@ public abstract class Model {
 	 */
 	protected void writeTempPdbFile() {
 		try {
-			pdb.writeToPDBFile(getTempPdbFile());
+			FileWriter writer = new FileWriter(getTempPdbFile());
+			writer.write(FileConvert.toPDB(pdb));
+			writer.close();
+			
 		} catch (IOException e) {
 			System.err.println("Error writing temporary PDB file "
 					+ getTempPdbFileName());
@@ -184,12 +192,14 @@ public abstract class Model {
 									// structure
 			if (Start.isDsspAvailable()) {
 				System.out.println("(Re)assigning secondary structure using DSSP");
-				try {
+				//TODO secondary structure
+				/*try {
+					
 					this.setSecondaryStructure(DsspRunner.runDssp(pdb,Start.DSSP_EXECUTABLE, Start.DSSP_PARAMETERS));
 				} catch (IOException e) {
 					System.err.println("Failed to assign secondary structure: "
 							+ e.getMessage());
-				}
+				}*/
 			}
 		}
 	}
@@ -245,8 +255,11 @@ public abstract class Model {
 	 * 
 	 * @return pdb
 	 */
-
-	public PdbChain getPdb() {
+	
+	
+	//switch PdbChain to Chain
+	//TODO change pdbchain to chain
+	public Chain getPdb() {
 		return pdb;
 	}
 
@@ -516,7 +529,7 @@ public abstract class Model {
 	 * @return
 	 */
 	public String getPdbResSerial(int resser) {
-		return pdb.getPdbResSerFromResSer(resser);
+		return pdb.getSeqResGroups().get(resser-1).getResidueNumber().toString();
 	}
 
 	public HashMap<Pair<Integer>, Integer> getAllCommonNbhSizes() {
@@ -553,7 +566,9 @@ public abstract class Model {
 	 * zero to one. Returns the scaled value of the current distance cutoff. May
 	 * only be called if has3DCoordinates is true.
 	 */
-	public double initDistMatrix() {
+	//TODO distmatrix later
+	/*public double initDistMatrix() {
+		
 		HashMap<Pair<Integer>, Double> distMatrixRes = this.pdb
 				.calcDistMatrix(Start.DIST_MAP_CONTACT_TYPE);
 		double max = Collections.max(distMatrixRes.values());
@@ -566,7 +581,7 @@ public abstract class Model {
 		}
 		double dist = (graph.getCutoff() - min) / (max - min);
 		return dist;
-	}
+	}*/
 
 	/**
 	 * Returns the current distance matrix. Before initDistMatrix has been
@@ -591,12 +606,15 @@ public abstract class Model {
 	 * @return A map assigning to each edge the corresponding value in the
 	 *         difference distance matrix or null on error.
 	 */
-	public HashMap<Pair<Integer>, Double> getDiffDistMatrix(MultipleSequenceAlignment ali,
+	
+	//TODO dist matrix
+	/*
+	 * TODO: Also force c-alpha for simple distance maps? Throw proper
+	 * exceptions instead of returning null? Use real matrix?
+	 */
+	/*public HashMap<Pair<Integer>, Double> getDiffDistMatrix(MultipleSequenceAlignment ali,
 			Model secondModel) {
-		/*
-		 * TODO: Also force c-alpha for simple distance maps? Throw proper
-		 * exceptions instead of returning null? Use real matrix?
-		 */
+
 		double diff, min, max;
 		if (!this.has3DCoordinates() || !secondModel.has3DCoordinates()) {
 			System.err
@@ -627,7 +645,7 @@ public abstract class Model {
 			}
 		}
 		return diffDistMatrix;
-	}
+	}*/
 
 	/**
 	 * Returns true if this model contains 3D coordinates. Certain other methods
@@ -637,17 +655,6 @@ public abstract class Model {
 	 */
 	public boolean has3DCoordinates() {
 		return (pdb != null);
-	}
-
-	/**
-	 * Gets the pdb coordinates.
-	 * 
-	 * @return the coordinates, returns null if there is no such information
-	 *         available.
-	 * @see #has3DCoordinates()
-	 */
-	public PdbChain get3DCoordinates() {
-		return pdb;
 	}
 
 	/**

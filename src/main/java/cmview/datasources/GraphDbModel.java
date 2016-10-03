@@ -1,8 +1,15 @@
 package cmview.datasources;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.sql.SQLException;
+
+import org.biojava.nbio.structure.Structure;
+import org.biojava.nbio.structure.io.mmcif.MMcifParser;
+import org.biojava.nbio.structure.io.mmcif.SimpleMMcifConsumer;
+import org.biojava.nbio.structure.io.mmcif.SimpleMMcifParser;
 
 import owl.core.structure.*;
 import owl.core.structure.graphs.DbRIGraph;
@@ -45,25 +52,44 @@ public class GraphDbModel extends Model {
 			try {
 				File cifFile = new File(Start.TEMP_DIR,pdbCode + ".cif");
 				PdbAsymUnit.grabCifFile(null, Start.PDB_FTP_URL, pdbCode, cifFile, true);
-				PdbAsymUnit fullpdb = new PdbAsymUnit(cifFile, modelSerial);
-				this.pdb = fullpdb.getChain(pdbChainCode);
+				
+				//PdbAsymUnit fullpdb = new PdbAsymUnit(cifFile, modelSerial);
+				MMcifParser parser = new SimpleMMcifParser();
+
+		        SimpleMMcifConsumer consumer = new SimpleMMcifConsumer();
+
+		        // The Consumer builds up the BioJava - structure object.
+		        // you could also hook in your own and build up you own data model.          
+		        parser.addMMcifConsumer(consumer);
+
+		       
+		        parser.parse(new BufferedReader(new FileReader(cifFile)));
+		         
+
+		        // now get the protein structure.
+		        Structure fullpdb = consumer.getStructure();
+				
+		        //this.pdb = fullpdb.getChain(pdbChainCode);
+		        this.pdb = fullpdb.getPolyChainByPDB(pdbChainCode, modelSerial-1);
+				
 				super.writeTempPdbFile(); // this doesn't make sense without a pdb object
-			} catch (PdbLoadException e) {
+			} /*catch (PdbLoadException e) {
 				System.err.println("Failed to load structure: " + e.getMessage());
 				pdb = null;
-			} catch(IOException e) {
+			}*/ catch(IOException e) {
 				System.err.println("Failed to load structure because of error while downloading/reading the CIF file: "+e.getMessage());
 				pdb = null;
-			} catch (FileFormatException e) {
+			} /*catch (FileFormatException e) {
 				System.err.println("Failed to load structure: "+e.getMessage());
 				pdb = null;				
-			}
+			}*/
 			// if pdb created failed then pdb=null
 			
 			// if structure is available, and has secondary structure annotation, use it
-			if(this.pdb != null && pdb.getSecondaryStructure() != null) {
+			//TODO secondary structure
+			/*if(this.pdb != null && pdb.getSecondaryStructure() != null) {
 				this.secondaryStructure = pdb.getSecondaryStructure(); 
-			}
+			}*/
 			//super.filterContacts(seqSep);	// currently not allowed to filter contacts
 			super.printWarnings(pdbChainCode);
 			
