@@ -9,7 +9,12 @@ import java.util.Collections;
 import java.util.HashMap;
 
 import org.biojava.nbio.structure.Chain;
+import org.biojava.nbio.structure.Group;
+import org.biojava.nbio.structure.ResidueNumber;
+import org.biojava.nbio.structure.StructureException;
 import org.biojava.nbio.structure.io.FileConvert;
+import org.biojava.nbio.structure.secstruc.SecStrucCalc;
+import org.biojava.nbio.structure.secstruc.SecStrucInfo;
 
 import owl.core.connections.JPredConnection;
 import owl.core.runners.DsspRunner;
@@ -77,6 +82,7 @@ public abstract class Model {
 	protected boolean modified = false;	// whether the model (i.e. mainly the graph)
 									// has been modified (edges added or deleted)
 	
+	//protected SecStrucCalc secondaryStructure;
 	protected SecondaryStructure secondaryStructure;	// store the secondary
 														// structure independent
 														// of the PDB object, e.g.
@@ -193,9 +199,17 @@ public abstract class Model {
 			if (Start.isDsspAvailable()) {
 				System.out.println("(Re)assigning secondary structure using DSSP");
 				//TODO secondary structure
+				//TODO probably dont need this method
 				/*try {
 					
+					//first get secondstruc with biojava, then use biojava to run dssp, 
+					//then convert to owl 
+					
+					
+					//TODO probably dont need this method
 					this.setSecondaryStructure(DsspRunner.runDssp(pdb,Start.DSSP_EXECUTABLE, Start.DSSP_PARAMETERS));
+					//If the more detailed DSSP prediction is required call this afterwards
+				    //DSSPParser.fetch(pdbID, s, true); //Second parameter true overrides the previous SS
 				} catch (IOException e) {
 					System.err.println("Failed to assign secondary structure: "
 							+ e.getMessage());
@@ -529,7 +543,27 @@ public abstract class Model {
 	 * @return
 	 */
 	public String getPdbResSerial(int resser) {
-		return pdb.getSeqResGroups().get(resser-1).getResidueNumber().toString();
+		if(pdb.getSeqResGroups().get(resser-1).getResidueNumber() == null){
+			return "?";
+		}
+		else
+			return pdb.getSeqResGroups().get(resser-1).getResidueNumber().toString();
+	}
+	
+	
+	
+	
+	
+	//can convert the interval from biojava to owl
+	//TODO biojava -> owl 
+	public int getResSerial(ResidueNumber resNum, Chain pdb) {
+		try {
+			Group g = pdb.getGroupByPDB(resNum);
+			return pdb.getEntityInfo().getAlignedResIndex(g, pdb);
+		} catch (StructureException e) {
+			System.err.println("Warning: no group found for "+resNum);
+			return -1;
+		}
 	}
 
 	public HashMap<Pair<Integer>, Integer> getAllCommonNbhSizes() {
@@ -567,10 +601,10 @@ public abstract class Model {
 	 * only be called if has3DCoordinates is true.
 	 */
 	//TODO distmatrix later
-	/*public double initDistMatrix() {
+	public double initDistMatrix() {
 		
-		HashMap<Pair<Integer>, Double> distMatrixRes = this.pdb
-				.calcDistMatrix(Start.DIST_MAP_CONTACT_TYPE);
+		HashMap<Pair<Integer>, Double> distMatrixRes = Utils.calcDistMatrixbjv(pdb);
+		//HashMap<Pair<Integer>, Double> distMatrixRes = this.pdb.calcDistMatrix(Start.DIST_MAP_CONTACT_TYPE);
 		double max = Collections.max(distMatrixRes.values());
 		double min = Collections.min(distMatrixRes.values());
 		distMatrix = new HashMap<Pair<Integer>, Double>(); // TODO: Use old
@@ -581,7 +615,7 @@ public abstract class Model {
 		}
 		double dist = (graph.getCutoff() - min) / (max - min);
 		return dist;
-	}*/
+	}
 
 	/**
 	 * Returns the current distance matrix. Before initDistMatrix has been
@@ -701,6 +735,7 @@ public abstract class Model {
 		// assert pdb.getSecondaryStructure()==graph.getSecondaryStructure();
 
 		return this.secondaryStructure!=null?this.secondaryStructure:new SecondaryStructure("");
+		//return this.secondaryStructure!=null?this.secondaryStructure:new SecondaryStructure("");
 //		if (pdb != null && pdb.hasSecondaryStructure()) {
 //			return pdb.getSecondaryStructure();
 //		} else {

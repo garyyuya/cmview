@@ -2119,7 +2119,7 @@ implements MouseListener, MouseMotionListener, ComponentListener {
 			public void run() {
 				registerThread(true);
 				//TODO dist matrix 
-				//mod.initDistMatrix();
+				mod.initDistMatrix();
 				// updateScreenBuffer();
 				registerThread(false);
 			}
@@ -2188,7 +2188,7 @@ implements MouseListener, MouseMotionListener, ComponentListener {
 	 */
 	public synchronized void updateDistanceMap() {
 		//TODO dist matrix
-		//scaledDistCutoff = mod.initDistMatrix();
+		scaledDistCutoff = mod.initDistMatrix();
 		// System.out.println("Scaled distance cutoff: " + scaledDistCutoff);
 	}
 

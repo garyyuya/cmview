@@ -3,13 +3,23 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.biojava.nbio.structure.Chain;
+import org.biojava.nbio.structure.Group;
+import org.biojava.nbio.structure.ResidueNumber;
 import org.biojava.nbio.structure.Structure;
+import org.biojava.nbio.structure.StructureException;
 import org.biojava.nbio.structure.StructureIO;
 import org.biojava.nbio.structure.io.mmcif.MMcifParser;
 import org.biojava.nbio.structure.io.mmcif.SimpleMMcifConsumer;
 import org.biojava.nbio.structure.io.mmcif.SimpleMMcifParser;
+import org.biojava.nbio.structure.secstruc.SecStrucCalc;
+import org.biojava.nbio.structure.secstruc.SecStrucElement;
+import org.biojava.nbio.structure.secstruc.SecStrucInfo;
+import org.biojava.nbio.structure.secstruc.SecStrucState;
+import org.biojava.nbio.structure.secstruc.SecStrucTools;
 
 import owl.core.structure.*;
 import owl.core.structure.graphs.RIGEnsemble;
@@ -18,6 +28,7 @@ import owl.core.util.FileFormatException;
 
 
 import cmview.Start;
+
 
 /** 
  * A contact map data model based on a structure loaded from a CIF file downloaded from pdb's ftp
@@ -96,8 +107,6 @@ public class PdbFtpModel extends Model {
 		try {
 			//PdbAsymUnit fullpdb = new PdbAsymUnit(cifFile,modelSerial);
 			
-			
-
 	        MMcifParser parser = new SimpleMMcifParser();
 
 	        SimpleMMcifConsumer consumer = new SimpleMMcifConsumer();
@@ -117,6 +126,18 @@ public class PdbFtpModel extends Model {
 	        br.close();
 	        
 	        
+	        
+	        
+
+	        // Predict and assign the SS of the Structure
+	        SecStrucCalc ssp = new SecStrucCalc();
+			try{
+				ssp.calculate(fullpdb, true);
+			}
+			catch(StructureException e){
+				System.err.println("Warning: Cannot calculate and assign secondarystructure ");
+			}
+
 			
 			if(pdbChainCode == null) {
 				//this.pdb = fullpdb.getFirstChain();
@@ -132,8 +153,11 @@ public class PdbFtpModel extends Model {
 				this.pdb = fullpdb.getPolyChainByPDB(pdbChainCode, modelSerial-1);
 			}
 			//TODO handle secondary structure later
+			
+			
+			this.secondaryStructure = Utils.convertSecondStruc(fullpdb, pdb);
 			//this.secondaryStructure = pdb.getSecondaryStructure();	// in case, dssp is n/a, use ss from pdb
-			super.checkAndAssignSecondaryStructure();				// if dssp is a/, recalculate ss
+			//super.checkAndAssignSecondaryStructure();				// if dssp is a/, recalculate ss
 			if(loadEnsembleGraph == false || this.parser.getModels().length == 1) {
 			
 				

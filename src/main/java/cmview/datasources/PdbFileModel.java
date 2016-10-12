@@ -4,7 +4,9 @@ import java.io.FileInputStream;
 import java.io.IOException;
 
 import org.biojava.nbio.structure.Structure;
+import org.biojava.nbio.structure.StructureException;
 import org.biojava.nbio.structure.io.PDBFileParser;
+import org.biojava.nbio.structure.secstruc.SecStrucCalc;
 
 import owl.core.structure.*;
 import owl.core.structure.graphs.RIGEnsemble;
@@ -82,6 +84,16 @@ public class PdbFileModel extends Model {
 			PDBFileParser pdbpars = new PDBFileParser();
 			Structure fullpdb = pdbpars.parsePDBFile(new FileInputStream(fileName));
 			
+	        // Predict and assign the SS of the Structure
+	        SecStrucCalc ssp = new SecStrucCalc();
+			try{
+				ssp.calculate(fullpdb, true);
+			}
+			catch(StructureException e){
+				System.err.println("Warning: Cannot calculate and assign secondarystructure ");
+			}
+			
+			
 			
 			if(pdbChainCode == null) {
 				//this.pdb = fullpdb.getFirstChain();
@@ -96,8 +108,9 @@ public class PdbFileModel extends Model {
 				this.pdb = fullpdb.getPolyChainByPDB(pdbChainCode, modelSerial-1);
 			}
 			//TODO handle secondary structure later
+			this.secondaryStructure = Utils.convertSecondStruc(fullpdb, pdb);
 			//this.secondaryStructure = pdb.getSecondaryStructure(); 	// in case, dssp is n/a, use ss from pdb
-			super.checkAndAssignSecondaryStructure();				// if dssp is a/, recalculate ss
+			//super.checkAndAssignSecondaryStructure();				// if dssp is a/, recalculate ss
 			if(loadEnsembleGraph == false || this.parser.getModels().length == 1) {
 				//this.graph = pdb.getRIGraph(edgeType, distCutoff);
 				this.graph = Utils.getRIGraph(pdb, edgeType, distCutoff, modelSerial);
