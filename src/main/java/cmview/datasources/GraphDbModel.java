@@ -71,6 +71,11 @@ public class GraphDbModel extends Model {
 				
 		        //this.pdb = fullpdb.getChain(pdbChainCode);
 		        this.pdb = fullpdb.getPolyChainByPDB(pdbChainCode, modelSerial-1);
+		        
+				if(this.pdb != null) {
+				this.secondaryStructure = Utils.convertSecondStruc(fullpdb, pdb);
+				//this.secondaryStructure = pdb.getSecondaryStructure(); 
+			}
 				
 				super.writeTempPdbFile(); // this doesn't make sense without a pdb object
 			} /*catch (PdbLoadException e) {

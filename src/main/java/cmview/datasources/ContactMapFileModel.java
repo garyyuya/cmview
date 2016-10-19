@@ -73,6 +73,15 @@ public class ContactMapFileModel extends Model {
 					//this.pdb = fullpdb.getChain(pdbChainCode);
 					this.pdb = fullpdb.getPolyChainByPDB(pdbChainCode, modelSerial-1);
 					super.writeTempPdbFile(); // this doesn't make sense without a pdb object
+					
+					
+					if(this.pdb != null) {
+					this.secondaryStructure = Utils.convertSecondStruc(fullpdb, pdb);
+					//this.secondaryStructure = pdb.getSecondaryStructure(); 
+				}	
+					
+					
+					
 				} /*catch (PdbLoadException e) {
 					System.err.println("Failed to load structure:" + e.getMessage());
 					pdb = null;
@@ -88,14 +97,16 @@ public class ContactMapFileModel extends Model {
 				//TODO secondary structure
 				/*if(this.pdb != null && pdb.getSecondaryStructure() != null) {
 					this.secondaryStructure = pdb.getSecondaryStructure(); 
-				}*/				
+				}*/			
 			} else {
 				System.out.println("No pdb code and/or chain code found. Can not load structure.");
 			} 
 			
 			//super.filterContacts(seqSep);	// currently not allowed to filter contacts
 			//super.printWarnings(chainCode); // doesn't make sense here
-			super.checkAndAssignSecondaryStructure();
+			
+			//TODO secondary structure
+			//super.checkAndAssignSecondaryStructure();
 			
 		} catch (IOException e) {
 			System.err.println("Error while trying to load graph from contact map file.");

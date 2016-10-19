@@ -85,13 +85,13 @@ public class PdbFileModel extends Model {
 			Structure fullpdb = pdbpars.parsePDBFile(new FileInputStream(fileName));
 			
 	        // Predict and assign the SS of the Structure
-	        SecStrucCalc ssp = new SecStrucCalc();
+	        /*SecStrucCalc ssp = new SecStrucCalc();
 			try{
 				ssp.calculate(fullpdb, true);
 			}
 			catch(StructureException e){
 				System.err.println("Warning: Cannot calculate and assign secondarystructure ");
-			}
+			}*/
 			
 			
 			

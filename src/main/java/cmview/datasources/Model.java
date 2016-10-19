@@ -82,7 +82,7 @@ public abstract class Model {
 	protected boolean modified = false;	// whether the model (i.e. mainly the graph)
 									// has been modified (edges added or deleted)
 	
-	//protected SecStrucCalc secondaryStructure;
+	
 	protected SecondaryStructure secondaryStructure;	// store the secondary
 														// structure independent
 														// of the PDB object, e.g.
@@ -543,7 +543,12 @@ public abstract class Model {
 	 * @return
 	 */
 	public String getPdbResSerial(int resser) {
-		if(pdb.getSeqResGroups().get(resser-1).getResidueNumber() == null){
+		//TODO here has exception when using comparison
+		if(resser == -1){
+			return "-";
+		}
+		
+		else if(pdb.getSeqResGroups().get(resser-1).getResidueNumber() == null){
 			return "?";
 		}
 		else

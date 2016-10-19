@@ -107,6 +107,19 @@ public class Utils {
 	}
 	
 	public static SecondaryStructure convertSecondStruc(Structure fullpdb, Chain pdb){
+		
+		
+		SecStrucCalc ssp = new SecStrucCalc();
+		try{
+			ssp.calculate(fullpdb, true);
+		}
+		catch(StructureException e){
+			System.err.println("Warning: Cannot calculate and assign secondarystructure ");
+		}
+		
+		
+
+		
 		List<org.biojava.nbio.structure.secstruc.SecStrucElement> sse = SecStrucTools.getSecStrucElements(fullpdb);
 		//SecondaryStructure secondaryStructure = new SecondaryStructure(pdb.getSequence().getSeq());
 		String seq = pdb.getSeqResSequence();
@@ -126,8 +139,8 @@ public class Utils {
 				char type;
 				String id;
 				if(e.getType().toString().equals("E")){
-					type = 'E';
-					String typeStr = "E";
+					type = 'S';
+					String typeStr = "S";
 					String intStr = Integer.toString(Ecount);
 					id = typeStr.concat(intStr);
 					Ecount++;

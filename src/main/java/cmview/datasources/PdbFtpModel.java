@@ -130,20 +130,20 @@ public class PdbFtpModel extends Model {
 	        
 
 	        // Predict and assign the SS of the Structure
-	        SecStrucCalc ssp = new SecStrucCalc();
+	        /*SecStrucCalc ssp = new SecStrucCalc();
 			try{
 				ssp.calculate(fullpdb, true);
 			}
 			catch(StructureException e){
 				System.err.println("Warning: Cannot calculate and assign secondarystructure ");
-			}
+			}*/
 
 			
 			if(pdbChainCode == null) {
 				//this.pdb = fullpdb.getFirstChain();
 				//pdbChainCode = this.pdb.getPdbChainCode(); 
 				this.pdb = fullpdb.getChains(modelSerial-1).get(0);
-				
+			
 				
 			//} else if(!fullpdb.containsPdbChainCode(pdbChainCode)) {
 			} else if(!fullpdb.hasPdbChain(pdbChainCode)) {
@@ -154,6 +154,7 @@ public class PdbFtpModel extends Model {
 			}
 			//TODO handle secondary structure later
 			
+			//TODO second
 			
 			this.secondaryStructure = Utils.convertSecondStruc(fullpdb, pdb);
 			//this.secondaryStructure = pdb.getSecondaryStructure();	// in case, dssp is n/a, use ss from pdb
