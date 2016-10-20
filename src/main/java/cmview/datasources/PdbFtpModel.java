@@ -152,9 +152,7 @@ public class PdbFtpModel extends Model {
 				//this.pdb = fullpdb.getChain(pdbChainCode);	
 				this.pdb = fullpdb.getPolyChainByPDB(pdbChainCode, modelSerial-1);
 			}
-			//TODO handle secondary structure later
 			
-			//TODO second
 			
 			this.secondaryStructure = Utils.convertSecondStruc(fullpdb, pdb);
 			//this.secondaryStructure = pdb.getSecondaryStructure();	// in case, dssp is n/a, use ss from pdb
@@ -179,7 +177,7 @@ public class PdbFtpModel extends Model {
 			// this.graph and this.residues are now available
 			//TODO 4Corinna compute graph geometry and hand it over to ContactView
 			if(Start.USE_CGAP) {
-				//TODO handle Geom later
+				//TODO Geom, should delete this part
 				//this.graphGeom = new RIGGeometry(this.graph, this.pdb);
 				System.out.println("PdbFtpModel   GraphGeometry loaded");
 				//this.graphGeom.printGeom();

@@ -91,10 +91,6 @@ public class GraphDbModel extends Model {
 			// if pdb created failed then pdb=null
 			
 			// if structure is available, and has secondary structure annotation, use it
-			//TODO secondary structure
-			/*if(this.pdb != null && pdb.getSecondaryStructure() != null) {
-				this.secondaryStructure = pdb.getSecondaryStructure(); 
-			}*/
 			//super.filterContacts(seqSep);	// currently not allowed to filter contacts
 			super.printWarnings(pdbChainCode);
 			

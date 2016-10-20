@@ -2118,7 +2118,6 @@ implements MouseListener, MouseMotionListener, ComponentListener {
 		new Thread() {
 			public void run() {
 				registerThread(true);
-				//TODO dist matrix 
 				mod.initDistMatrix();
 				// updateScreenBuffer();
 				registerThread(false);
@@ -2133,8 +2132,7 @@ implements MouseListener, MouseMotionListener, ComponentListener {
 		new Thread() {
 			public void run() {
 				registerThread(true);
-				//TODO dist map 
-				//diffDistMap = mod.getDiffDistMatrix(ali,mod2);
+				diffDistMap = mod.getDiffDistMatrix(ali,mod2);
 				// updateScreenBuffer();
 				registerThread(false);
 			}
@@ -2187,7 +2185,6 @@ implements MouseListener, MouseMotionListener, ComponentListener {
 	 * Triggers the distance map to be updated
 	 */
 	public synchronized void updateDistanceMap() {
-		//TODO dist matrix
 		scaledDistCutoff = mod.initDistMatrix();
 		// System.out.println("Scaled distance cutoff: " + scaledDistCutoff);
 	}
@@ -2196,8 +2193,7 @@ implements MouseListener, MouseMotionListener, ComponentListener {
 	 * Triggers the difference distance map to be updated
 	 */
 	public synchronized void updateDiffDistMap() {
-		//TODO dist map
-		//diffDistMap = mod.getDiffDistMatrix(ali,mod2);
+		diffDistMap = mod.getDiffDistMatrix(ali,mod2);
 	}	
 
 	/**

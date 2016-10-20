@@ -8,6 +8,7 @@ import java.io.PrintStream;
 import java.util.HashMap;
 import java.util.List;
 import java.util.TreeMap;
+import java.util.TreeSet;
 
 import javax.vecmath.Point3d;
 
@@ -25,6 +26,7 @@ import org.biojava.nbio.structure.secstruc.SecStrucTools;
 
 import edu.uci.ics.jung.graph.util.Pair;
 import owl.core.sequence.Sequence;
+import owl.core.sequence.alignment.MultipleSequenceAlignment;
 import owl.core.structure.AaResidue;
 import owl.core.structure.Atom;
 import owl.core.structure.PdbChain;
@@ -203,6 +205,97 @@ public class Utils {
 	}
 	
 	
+	
+	
+	public static boolean containstdAaResidueBioj(int resSerial, Chain pdb){
+		if(pdb.getSeqResGroup(resSerial-1)!=null && pdb.getSeqResGroup(resSerial-1).isAminoAcid()){
+			Group g = pdb.getSeqResGroup(resSerial-1);
+			if (!pdb.getAtomGroups().contains(g)) {
+				return false;
+			} 
+		}
+		
+		return true;
+	}
+	
+
+	//contacttype = Ca
+	public static HashMap<Pair<Integer>,Double> getDiffDistMapbiojchain(String contactType1, Chain pdb1,
+			Chain pdb2, String contactType2, MultipleSequenceAlignment ali, String name1, String name2){
+		HashMap<Pair<Integer>,Double> otherDistMatrix = calcDistMatrixbjv(pdb2);
+		HashMap<Pair<Integer>,Double> thisDistMatrix = calcDistMatrixbjv(pdb1);
+		//get sequence length = getSeqResLength?
+		//System.out.println("pdb1.length: " + pdb1.getSeqResLength() + " pdb2.length: " + pdb2.getSeqResLength());
+		HashMap<Pair<Integer>,Double> alignedDistMatrix = new HashMap<Pair<Integer>, Double>(Math.min(pdb1.getSeqResLength(), pdb2.getSeqResLength()));
+		
+		int i1,i2,j1,j2;
+		TreeSet<Integer> unobserved1 = new TreeSet<Integer>();
+		TreeSet<Integer> unobserved2 = new TreeSet<Integer>();
+		// detect all unobserved residues
+		
+		
+		/*
+		 * containsStdAaResidue:
+		 * Tells whether residue of given residue number is a (observed) standard amino 
+		 * acid residue in this PdbChain instance.  
+		 * 
+		 */
+		for(int i = 1; i <= ali.getAlignmentLength(); ++i) {
+			i1 = ali.al2seq(name1, i);
+			i2 = ali.al2seq(name2, i);
+			//containsStdAaResidue(i1)
+			if( i1 != -1 &&	!containstdAaResidueBioj(i1,pdb1)) {
+				unobserved1.add(i1);
+			}
+			
+			if( i2 != -1 && !containstdAaResidueBioj(i2,pdb2)) {
+				unobserved2.add(i2);
+			}
+		}
+		
+		
+		
+		// strategy: we always have to look through the alignment to say 
+		// whether a difference distance can be assigned to a pair of 
+		// corresponding residues. To put it differently, for any two 
+		// alignment columns one always has to ensure that both columns 
+		// only contain observed residues (no gaps!), otherwise the one 
+		// cannot obtain a distance in at least one structure as a gap 
+		// indicates "no coordinates available".  
+
+		for(int i = 1; i <= ali.getAlignmentLength()-1; ++i) {
+
+			i1 = ali.al2seq(name1, i);
+			i2 = ali.al2seq(name2, i);
+
+			// alignment columns must not contain gap characters and both 
+			// residues in the current column have to be observed!
+			if( i1 == -1 || i2 == -1 || unobserved1.contains(i1) || unobserved2.contains(i2) ) {
+				continue;
+			}
+
+			for(int j = i + 1; j <= ali.getAlignmentLength(); ++j) {
+
+				j1 = ali.al2seq(name1, j);
+				j2 = ali.al2seq(name2, j);
+
+				if( j1 == -1 || j2 == -1 || unobserved1.contains(j1) || unobserved2.contains(j2) ) {
+					continue;
+				}
+
+				// make the edges
+				Pair<Integer> e1 = new Pair<Integer>(i1,j1);
+				Pair<Integer> e2 = new Pair<Integer>(i2,j2);
+
+				if(thisDistMatrix.get(e1) == null || otherDistMatrix.get(e2) == null){
+					System.err.println("Warning: edge value equals null, e1: " + e1 + " e2: " + e2);
+					continue;
+				}
+				alignedDistMatrix.put(new Pair<Integer>(i,j),Math.abs(thisDistMatrix.get(e1)-otherDistMatrix.get(e2)));
+			}
+		}
+		return alignedDistMatrix;
+	}
 	
 	
 	

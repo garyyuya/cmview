@@ -107,7 +107,6 @@ public class PdbFileModel extends Model {
 				//this.pdb = fullpdb.getChain(pdbChainCode);
 				this.pdb = fullpdb.getPolyChainByPDB(pdbChainCode, modelSerial-1);
 			}
-			//TODO handle secondary structure later
 			this.secondaryStructure = Utils.convertSecondStruc(fullpdb, pdb);
 			//this.secondaryStructure = pdb.getSecondaryStructure(); 	// in case, dssp is n/a, use ss from pdb
 			//super.checkAndAssignSecondaryStructure();				// if dssp is a/, recalculate ss

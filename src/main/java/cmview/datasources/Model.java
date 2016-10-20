@@ -198,15 +198,12 @@ public abstract class Model {
 									// structure
 			if (Start.isDsspAvailable()) {
 				System.out.println("(Re)assigning secondary structure using DSSP");
-				//TODO secondary structure
-				//TODO probably dont need this method
 				/*try {
 					
 					//first get secondstruc with biojava, then use biojava to run dssp, 
 					//then convert to owl 
 					
 					
-					//TODO probably dont need this method
 					this.setSecondaryStructure(DsspRunner.runDssp(pdb,Start.DSSP_EXECUTABLE, Start.DSSP_PARAMETERS));
 					//If the more detailed DSSP prediction is required call this afterwards
 				    //DSSPParser.fetch(pdbID, s, true); //Second parameter true overrides the previous SS
@@ -272,7 +269,6 @@ public abstract class Model {
 	
 	
 	//switch PdbChain to Chain
-	//TODO change pdbchain to chain
 	public Chain getPdb() {
 		return pdb;
 	}
@@ -543,7 +539,6 @@ public abstract class Model {
 	 * @return
 	 */
 	public String getPdbResSerial(int resser) {
-		//TODO here has exception when using comparison
 		if(resser == -1){
 			return "-";
 		}
@@ -560,7 +555,6 @@ public abstract class Model {
 	
 	
 	//can convert the interval from biojava to owl
-	//TODO biojava -> owl 
 	public int getResSerial(ResidueNumber resNum, Chain pdb) {
 		try {
 			Group g = pdb.getGroupByPDB(resNum);
@@ -605,7 +599,6 @@ public abstract class Model {
 	 * zero to one. Returns the scaled value of the current distance cutoff. May
 	 * only be called if has3DCoordinates is true.
 	 */
-	//TODO distmatrix later
 	public double initDistMatrix() {
 		
 		HashMap<Pair<Integer>, Double> distMatrixRes = Utils.calcDistMatrixbjv(pdb);
@@ -646,12 +639,11 @@ public abstract class Model {
 	 *         difference distance matrix or null on error.
 	 */
 	
-	//TODO dist matrix
 	/*
 	 * TODO: Also force c-alpha for simple distance maps? Throw proper
 	 * exceptions instead of returning null? Use real matrix?
 	 */
-	/*public HashMap<Pair<Integer>, Double> getDiffDistMatrix(MultipleSequenceAlignment ali,
+	public HashMap<Pair<Integer>, Double> getDiffDistMatrix(MultipleSequenceAlignment ali,
 			Model secondModel) {
 
 		double diff, min, max;
@@ -663,8 +655,8 @@ public abstract class Model {
 
 		String name1 = this.getLoadedGraphID();
 		String name2 = secondModel.getLoadedGraphID();
-		HashMap<Pair<Integer>, Double> diffDistMatrix = this.pdb
-				.getDiffDistMap(Start.DIST_MAP_CONTACT_TYPE, secondModel.pdb,
+		HashMap<Pair<Integer>, Double> diffDistMatrix = Utils.
+				getDiffDistMapbiojchain(Start.DIST_MAP_CONTACT_TYPE, this.pdb, secondModel.pdb,
 						Start.DIST_MAP_CONTACT_TYPE, ali, name1, name2);
 
 		if (diffDistMatrix == null) {
@@ -684,7 +676,7 @@ public abstract class Model {
 			}
 		}
 		return diffDistMatrix;
-	}*/
+	}
 
 	/**
 	 * Returns true if this model contains 3D coordinates. Certain other methods

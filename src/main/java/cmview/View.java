@@ -2035,10 +2035,10 @@ public class View extends JFrame implements ActionListener {
 		setCursor(java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.WAIT_CURSOR));
 		
 		/*try {
-			//TODO Dali later
-			//DaliRunner dali = new DaliRunner(mod.getPdb(), mod2.getPdb(), mod.getLoadedGraphID(), mod2.getLoadedGraphID(), Start.DALI_EXECUTABLE,Start.TEMP_DIR);
-			//doLoadPairwiseAlignment(MultipleSequenceAlignment.CLUSTALFORMAT,dali.getClustalFile());
-		} catch (InterruptedException e) {
+			//TODO Dali
+			DaliRunner dali = new DaliRunner(mod.getPdb(), mod2.getPdb(), mod.getLoadedGraphID(), mod2.getLoadedGraphID(), Start.DALI_EXECUTABLE,Start.TEMP_DIR);
+			doLoadPairwiseAlignment(MultipleSequenceAlignment.CLUSTALFORMAT,dali.getClustalFile());
+		} 	catch (InterruptedException e) {
 			setCursor(java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.DEFAULT_CURSOR));
 			throw new AlignmentConstructionException("Could not construct alignment: Execution Interrupted");
 		}*/
@@ -2731,7 +2731,7 @@ public class View extends JFrame implements ActionListener {
 				cmPane.getTopLevelAncestor().setCursor(java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.WAIT_CURSOR));
 				String fn = guiState.getResidueScoringFunctionName(secondView);
 				ResidueContactScoringFunction f = statusBar.getScoringFunctionWithName(fn);
-				//TODO need to figure out how to use init with biojava chain
+				
 				f.init(null, mod.getGraph(), mod.getSecondaryStructure(), null, Start.getDbConnection());
 				cmPane.getTopLevelAncestor().setCursor(java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.DEFAULT_CURSOR));
 			}
@@ -2741,7 +2741,7 @@ public class View extends JFrame implements ActionListener {
 				cmPane.getTopLevelAncestor().setCursor(java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.WAIT_CURSOR));
 				String fn = guiState.getResidueScoringFunctionName(secondView);
 				ResidueContactScoringFunction f = statusBar.getScoringFunctionWithName(fn);
-				//TODO need to figure out how to use init with biojava chain
+				
 				f.init(null, mod.getGraph(), mod.getSecondaryStructure(), null, Start.getDbConnection());
 				cmPane.getTopLevelAncestor().setCursor(java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.DEFAULT_CURSOR));
 			}
@@ -2758,7 +2758,7 @@ public class View extends JFrame implements ActionListener {
 				cmPane.getTopLevelAncestor().setCursor(java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.WAIT_CURSOR));
 				String fn = guiState.getResidueScoringFunctionName(false);
 				ResidueContactScoringFunction f = statusBar.getScoringFunctionWithName(fn);
-				//TODO need to figure out how to use updatedata with biojava chain
+				
 				f.updateData(null,mod.getGraph(), mod.getSecondaryStructure(), null);
 				cmPane.getTopLevelAncestor().setCursor(java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.DEFAULT_CURSOR));
 			}
@@ -2766,7 +2766,7 @@ public class View extends JFrame implements ActionListener {
 				cmPane.getTopLevelAncestor().setCursor(java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.WAIT_CURSOR));
 				String fn = guiState.getResidueScoringFunctionName(true);
 				ResidueContactScoringFunction f = statusBar.getScoringFunctionWithName(fn);
-				//TODO need to figure out how to use updatedata with biojava chain
+				
 				f.updateData(null,mod.getGraph(), mod.getSecondaryStructure(), null);
 				cmPane.getTopLevelAncestor().setCursor(java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.DEFAULT_CURSOR));
 			}

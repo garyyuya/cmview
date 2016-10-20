@@ -82,10 +82,7 @@ public class ContactMapFileModel extends Model {
 					
 					
 					
-				} /*catch (PdbLoadException e) {
-					System.err.println("Failed to load structure:" + e.getMessage());
-					pdb = null;
-				}*/ catch(IOException e) {
+				}  	catch(IOException e) {
 					System.err.println("Failed to load structure because of error while downloading/reading the CIF file: "+e.getMessage());
 					pdb = null;
 				} 
@@ -93,20 +90,13 @@ public class ContactMapFileModel extends Model {
 
 				
 				
-				// if structure is available, and has secondary structure annotation, use it
-				//TODO secondary structure
-				/*if(this.pdb != null && pdb.getSecondaryStructure() != null) {
-					this.secondaryStructure = pdb.getSecondaryStructure(); 
-				}*/			
+				// if structure is available, and has secondary structure annotation, use it	
 			} else {
 				System.out.println("No pdb code and/or chain code found. Can not load structure.");
 			} 
 			
 			//super.filterContacts(seqSep);	// currently not allowed to filter contacts
 			//super.printWarnings(chainCode); // doesn't make sense here
-			
-			//TODO secondary structure
-			//super.checkAndAssignSecondaryStructure();
 			
 		} catch (IOException e) {
 			System.err.println("Error while trying to load graph from contact map file.");
