@@ -2,6 +2,8 @@ package cmview.datasources;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
@@ -210,12 +212,36 @@ public class Utils {
 	public static boolean containstdAaResidueBioj(int resSerial, Chain pdb){
 		if(pdb.getSeqResGroup(resSerial-1)!=null && pdb.getSeqResGroup(resSerial-1).isAminoAcid()){
 			Group g = pdb.getSeqResGroup(resSerial-1);
-			if (!pdb.getAtomGroups().contains(g)) {
-				return false;
+			if (pdb.getAtomGroups().contains(g)) {
+				return true;
 			} 
 		}
 		
-		return true;
+		return false;
+	}
+	
+	public static TreeMap<Integer, Character> getUnobservedResiduesBioj(Chain c){
+		TreeMap<Integer, Character> tmap = new TreeMap<Integer, Character>();
+		for(int i = 1; i < c.getSeqResLength(); i++){
+			if(!containstdAaResidueBioj(i,c)){
+				//how to get the residue?
+				Character value = StructureTools.get1LetterCodeAmino(c.getAtomGroup(i).getPDBName());
+				tmap.put(i, value);
+			}
+		}
+		return tmap;
+	}
+	
+	
+	
+	public static int aAResidueCountBioj(Chain pdb){
+		int count = 0;
+		for(int i = 0; i < pdb.getAtomLength(); i++){
+			if(pdb.getAtomGroup(i).isAminoAcid()){
+				count++;
+			}
+		}
+		return count;
 	}
 	
 
@@ -300,26 +326,23 @@ public class Utils {
 	
 	
 	
-	/*public static HashMap<Pair<Integer>, Double> calcDistMatrix(String ct){
-		HashMap<Pair<Integer>,Double> distMatrixAtoms = calcAtomDistMatrix(ct);
 
-		 // mapping atom serials to residue serials
-		 // TODO: we could integrate this with the code in calcAtomDistMatrix to avoid storing two distance maps in memory
-		HashMap<Pair<Integer>,Double> distMatrixRes = new HashMap<Pair<Integer>, Double>();
-		for (Pair<Integer> cont: distMatrixAtoms.keySet()){
-			int i_resser = getResSerFromAtomSer(cont.getFirst());
-			int j_resser = getResSerFromAtomSer(cont.getSecond());
-			Pair<Integer> edge = new Pair<Integer>(i_resser,j_resser);
-			if (distMatrixRes.containsKey(edge)) {
-				distMatrixRes.put(edge, Math.min(distMatrixRes.get(edge), distMatrixAtoms.get(cont)));
-			} else {
-				distMatrixRes.put(edge, distMatrixAtoms.get(cont));
-			}
-		}
-
-		return distMatrixRes;
-	}*/
-
+	public static void writeToPDBFileBioj(File outFile, Chain c) throws FileNotFoundException{
+		PrintStream out = new PrintStream(new FileOutputStream(outFile));
+		String pdboutput = c.toPDB();
+		out.println(pdboutput);
+		
+		out.println("END");
+		out.close();
+	}
+	
+	
+	
+	
+	
+	
+	
+	
 	
 	
 	

@@ -2034,14 +2034,15 @@ public class View extends JFrame implements ActionListener {
 		
 		setCursor(java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.WAIT_CURSOR));
 		
-		/*try {
+		try {
 			//TODO Dali
-			DaliRunner dali = new DaliRunner(mod.getPdb(), mod2.getPdb(), mod.getLoadedGraphID(), mod2.getLoadedGraphID(), Start.DALI_EXECUTABLE,Start.TEMP_DIR);
+			//DaliRunner dali = new DaliRunner(mod.getPdb(), mod2.getPdb(), mod.getLoadedGraphID(), mod2.getLoadedGraphID(), Start.DALI_EXECUTABLE,Start.TEMP_DIR);
+			cmview.utils.DaliRunner dali = new cmview.utils.DaliRunner(mod.getPdb(), mod2.getPdb(), mod.getLoadedGraphID(), mod2.getLoadedGraphID(), Start.DALI_EXECUTABLE,Start.TEMP_DIR);
 			doLoadPairwiseAlignment(MultipleSequenceAlignment.CLUSTALFORMAT,dali.getClustalFile());
 		} 	catch (InterruptedException e) {
 			setCursor(java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.DEFAULT_CURSOR));
 			throw new AlignmentConstructionException("Could not construct alignment: Execution Interrupted");
-		}*/
+		}
 		setCursor(java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.DEFAULT_CURSOR));
 		
 	}
